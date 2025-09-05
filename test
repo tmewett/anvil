@@ -23,5 +23,5 @@ export PYTHONPATH="$(pwd)"
 
 popd; pushd tests/empty
 rm -f build.ninja
-python anvil_gen.py
+python3 anvil_gen.py
 test -e build.ninja || exit 1
