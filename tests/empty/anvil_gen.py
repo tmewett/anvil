@@ -1,3 +1,3 @@
 import anvil
 
-anvil.generate_ninja()
+anvil.generate_ninja(lambda: [])

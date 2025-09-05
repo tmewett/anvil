@@ -21,6 +21,13 @@ done
 cd "$(dirname "$0")" || exit 1
 export PYTHONPATH="$(pwd)"
 
+popd; pushd tests/rule
+rm -f build.ninja file
+python3 anvil_gen.py
+test -e build.ninja || exit 1
+ninja || exit 1
+test -e file || exit 1
+
 popd; pushd tests/empty
 rm -f build.ninja
 python3 anvil_gen.py
