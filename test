@@ -25,7 +25,7 @@ popd; pushd tests/rule
 rm -f build.ninja file
 python3 anvil_gen.py
 test -e build.ninja || exit 1
-ninja || exit 1
+ninja file || exit 1
 test -e file || exit 1
 
 popd; pushd tests/empty

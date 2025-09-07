@@ -4,9 +4,9 @@ touch = anvil.Rule("touch", {
     'command': "touch $out",
 })
 
-def get_targets(config):
+def get_targets():
     return [
-        anvil.Target("file", touch)
+        anvil.Target("file", touch, [])
     ]
 
 anvil.generate_ninja(get_targets)
