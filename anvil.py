@@ -1,3 +1,4 @@
+import argparse
 from dataclasses import dataclass
 
 @dataclass
@@ -10,6 +11,19 @@ class Target:
     path: str
     rule: Rule
     inputs: list
+
+@dataclass
+class Option:
+    name: str
+    # should test no dup opts
+    def __hash__(self):
+        return id(self)
+    def __eq__(self, other):
+        return self is other
+
+@dataclass
+class Context:
+    config: dict
 
 def _rule_to_ninja(rule):
     return (
@@ -24,8 +38,11 @@ def _target_to_ninja(target):
         + ["\n"]
     )
 
-def generate_ninja(get_targets):
-    targets = get_targets()
+def generate_ninja(get_targets, *, options=[]):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-D", action='append')
+    args = parser.parse_args()
+    targets = get_targets(Context())
     rules = [t.rule for t in targets]
     fragments = []
     for rule in rules:

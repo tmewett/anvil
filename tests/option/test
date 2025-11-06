@@ -1,0 +1,12 @@
+#!/bin/sh
+cd "$(dirname "$0")"
+. ../../test_common.sh
+
+$PYTHON anvil_gen.py -D error=true
+if test $? -eq 0; then
+    test_exit 1 "expected error but succeeded"
+fi
+$PYTHON anvil_gen.py
+if test $? -eq 1; then
+    test_exit 1 "expected success but got error"
+fi
