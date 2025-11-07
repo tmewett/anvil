@@ -42,7 +42,10 @@ def generate_ninja(get_targets, *, options=[]):
     parser = argparse.ArgumentParser()
     parser.add_argument("-D", action='append')
     args = parser.parse_args()
-    targets = get_targets(Context())
+    ds = args.D or []
+    given_config = dict(arg.split("=", maxsplit=1) for arg in ds)
+    config = {opt: given_config.get(opt.name) for opt in options}
+    targets = get_targets(Context(config))
     rules = [t.rule for t in targets]
     fragments = []
     for rule in rules:
