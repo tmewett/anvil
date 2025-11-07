@@ -10,7 +10,7 @@ class Rule:
 class Target:
     path: str
     rule: Rule
-    inputs: list
+    inputs: list = ()
 
 @dataclass
 class Option:
@@ -26,6 +26,7 @@ class Context:
     config: dict
 
 def _rule_to_ninja(rule):
+    rule.options['command'] = f"""_anvil_tmp="$$(mktemp -d --tmpdir anvil.build.XXXXXXXX)" && cp -s --parents -t $$_anvil_tmp $in && {rule.options['command']}; _anvil_status=$$?; rm -rf $$_anvil_tmp; exit $$_anvil_status"""
     return (
         [f"rule {rule.nickname}\n"]
         + [f"  {var} = {value}\n" for var, value in rule.options.items()]
@@ -45,7 +46,8 @@ def generate_ninja(get_targets, *, options=[]):
     ds = args.D or []
     given_config = dict(arg.split("=", maxsplit=1) for arg in ds)
     config = {opt: given_config.get(opt.name) for opt in options}
-    targets = get_targets(Context(config))
+    target_iters = get_targets(Context(config))
+    targets = [t for ts in target_iters for t in ts]
     rules = [t.rule for t in targets]
     fragments = []
     for rule in rules:
