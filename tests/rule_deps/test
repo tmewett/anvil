@@ -1,0 +1,5 @@
+#!/bin/sh
+cd "$(dirname "$0")"
+. ../../test_common.sh
+
+$PYTHON build.anvil.py
