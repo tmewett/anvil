@@ -1,7 +1,7 @@
 import anvil
 
 def get_targets(ctx):
-    cat = anvil.Rule("rule", {
+    cat = ctx.sandboxed_rule("rule", {
         'command': "cat input1 $in > $out",
     })
     output_file = [anvil.Target("output", cat, inputs=["input2"])]

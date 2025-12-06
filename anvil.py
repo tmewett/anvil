@@ -24,9 +24,10 @@ class Option:
 @dataclass
 class Context:
     config: dict
+    def sandboxed_rule(self, nickname, options):
+        return Rule(nickname, options | {'command': f"""_anvil_tmp="$$(bash ../../create_sandbox.bash $in)" && cd $$_anvil_tmp && {options['command']}; _anvil_status=$$?; rm -rf $$_anvil_tmp; exit $$_anvil_status"""})
 
 def _rule_to_ninja(rule):
-    rule.options['command'] = f"""_anvil_tmp="$$(bash ../../create_sandbox.bash $in)" && cd $$_anvil_tmp && {rule.options['command']}; _anvil_status=$$?; rm -rf $$_anvil_tmp; exit $$_anvil_status"""
     return (
         [f"rule {rule.nickname}\n"]
         + [f"  {var} = {value}\n" for var, value in rule.options.items()]
