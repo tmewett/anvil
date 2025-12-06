@@ -9,8 +9,8 @@ class Rule:
 @dataclass
 class Target:
     path: str
-    action: str
-    args: list = ()
+    rule: Rule
+    inputs: list = ()
 
 @dataclass
 class Option:
@@ -57,5 +57,3 @@ def generate_ninja(get_targets, *, options=[]):
     with open("build.ninja", 'w') as f:
         for frag in fragments:
             f.write(frag)
-
-def do(get_targets):
