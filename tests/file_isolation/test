@@ -3,4 +3,8 @@ cd "$(dirname "$0")"
 . ../../test_common.sh
 
 $PYTHON anvil_gen.py
+rm output
 ninja output
+if test $? -eq 0; then
+    test_exit 1 "expected error but succeeded"
+fi
