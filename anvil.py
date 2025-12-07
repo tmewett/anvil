@@ -18,8 +18,8 @@ class Target:
 
 @dataclass
 class Option:
+    # todo no dups
     name: str
-    # should test no dup opts
     def __hash__(self):
         return id(self)
     def __eq__(self, other):
