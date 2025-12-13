@@ -51,8 +51,14 @@ def generate_ninja(get_targets, *, options=[]):
     ds = args.D or []
     given_config = dict(arg.split("=", maxsplit=1) for arg in ds)
     config = {opt: given_config.get(opt.name) for opt in options}
-    target_iters = get_targets(Context(config))
-    targets = [t for ts in target_iters for t in ts]
+    targets = []
+    def gather_from(x):
+        if isinstance(x, Target):
+            targets.append(x)
+        else:
+            for xx in x:
+                gather_from(xx)
+    gather_from(get_targets(Context(config)))
     rules = {t.rule for t in targets}
     fragments = []
     for rule in rules:
