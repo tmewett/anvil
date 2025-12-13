@@ -20,6 +20,8 @@ class Target:
 class Option:
     # todo no dups
     name: str
+    def configure(self, ctx):
+        return ctx.config[self]
     def __hash__(self):
         return id(self)
     def __eq__(self, other):
