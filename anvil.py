@@ -13,8 +13,7 @@ class Rule:
 @dataclass
 class Target:
     path: str
-    rule: Rule
-    inputs: list = ()
+    function: str
 
 @dataclass
 class Option:
@@ -30,23 +29,12 @@ class Option:
 @dataclass
 class Context:
     config: dict
-    def sandboxed_rule(self, nickname, options):
-        return Rule(nickname, options | {'command': f"""_anvil_tmp="$$(bash ../../create_sandbox.bash $in)" && _anvil_wd="$$(pwd)" && cd $$_anvil_tmp && {options['command']} && cp --parents -t "$$_anvil_wd" $out; _anvil_status=$$?; rm -rf $$_anvil_tmp; exit $$_anvil_status"""})
 
-def _rule_to_ninja(rule):
-    return (
-        [f"rule {rule.nickname}\n"]
-        + [f"  {var} = {value}\n" for var, value in rule.options.items()]
-    )
+def touch(out):
+    with open(out, "w"):
+        pass
 
-def _target_to_ninja(target):
-    return (
-        [f"build {target.path}: {target.rule.nickname}"]
-        + [f" {input}" for input in target.inputs]
-        + ["\n"]
-    )
-
-def generate_ninja(get_targets, *, options=[]):
+def run(get_targets, *, options=[]):
     parser = argparse.ArgumentParser()
     parser.add_argument("-D", action='append')
     args = parser.parse_args()
@@ -61,12 +49,7 @@ def generate_ninja(get_targets, *, options=[]):
             for xx in x:
                 gather_from(xx)
     gather_from(get_targets(Context(config)))
-    rules = {t.rule for t in targets}
-    fragments = []
-    for rule in rules:
-        fragments += _rule_to_ninja(rule)
-    for target in targets:
-        fragments += _target_to_ninja(target)
-    with open("build.ninja", 'w') as f:
-        for frag in fragments:
-            f.write(frag)
+    # rules = {t.rule for t in targets}
+    for t in targets:
+        module, var = t.function.rsplit(".", maxsplit=1)
+        getattr(__import__(module), var)(os.path.join("anvil_out", t.path))
